@@ -1,7 +1,10 @@
 "use client";
 
 import * as React from "react";
-import { useActionState } from "react";
+import { useActionState, useTransition } from "react";
+import { toast } from "sonner";
+
+import { placeHoldAction } from "@/app/dashboard/(panel)/proposals/actions";
 import {
   AlertTriangle,
   ArrowRight,
@@ -314,15 +317,39 @@ function AvailabilityReport({
             <p className="mt-0.5 text-sm text-muted-foreground">
               {result.nextStep.detail}
             </p>
-            {canHold && hasSpaces && (
-              <Button size="sm" className="mt-3">
-                <Lock className="size-3.5" /> Place a hold
-              </Button>
-            )}
+            {canHold && hasSpaces && <PlaceHoldButton date={result.date} />}
           </div>
         </div>
       </div>
     </div>
+  );
+}
+
+function PlaceHoldButton({ date }: { date: string }) {
+  const [pending, start] = useTransition();
+  return (
+    <Button
+      size="sm"
+      className="mt-3"
+      disabled={pending}
+      onClick={() =>
+        start(async () => {
+          const fd = new FormData();
+          fd.set("eventDate", date);
+          fd.set("couple", "Availability enquiry");
+          const r = await placeHoldAction(null, fd);
+          if (r.ok) toast.success(r.message);
+          else toast.error(r.message);
+        })
+      }
+    >
+      {pending ? (
+        <Loader2 className="size-3.5 animate-spin" />
+      ) : (
+        <Lock className="size-3.5" />
+      )}
+      Place a hold
+    </Button>
   );
 }
 

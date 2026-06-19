@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Link from "next/link";
 import { ArrowUpRight, Building2, Search } from "lucide-react";
 
 import {
@@ -22,6 +21,7 @@ import {
 } from "@/components/ui/table";
 import { VENUE_TYPE_LABELS } from "@/lib/constants";
 import { formatINRShort } from "@/lib/format";
+import { venueUrl } from "@/lib/urls";
 import { cn } from "@/lib/utils";
 import type { PropertyRow } from "./property-types";
 
@@ -136,13 +136,15 @@ export function PropertiesTable({
                     {formatINRShort(p.revenue)}
                   </TableCell>
                   <TableCell className="pr-4 text-right">
-                    <Link
-                      href="/"
-                      aria-label={`Open ${p.name}`}
+                    <a
+                      href={venueUrl(p.slug)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`Open ${p.name} site`}
                       className="inline-flex size-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
                     >
                       <ArrowUpRight className="size-4" />
-                    </Link>
+                    </a>
                   </TableCell>
                 </TableRow>
               ))}

@@ -1,22 +1,20 @@
-// proxy.ts — Next.js 16 renamed `middleware` → `proxy` (Node.js runtime only;
-// the edge runtime is NOT supported here). Multi-tenant host-based routing.
+// proxy.ts — Next.js 16 renamed `middleware` → `proxy` (Node.js runtime only).
+// Two routing modes:
 //
-// Hosts:
-//   <root> / www.<root> / localhost   → marketing (served at root, no rewrite)
-//   app.<root> / app.localhost        → dashboard  (rewritten to /dashboard/*, auth-gated)
-//   anything else (venue.<root> or a  → tenant site (rewritten to /s/<venue>/*)
-//     fully custom domain)
+//  HOST MODE (custom domain with wildcard DNS — the production target):
+//    <root> / www / localhost     → marketing (served at root)
+//    app.<root>                   → dashboard (rewritten to /dashboard/*, auth-gated)
+//    {venue}.<root> / custom      → tenant site (rewritten to /s/<venue>/*)
+//    /dashboard and /s are INTERNAL targets, blocked (404) as direct requests.
 //
-// Security model:
-//   - /api and /trpc are NEVER host-rewritten and NEVER Clerk-gated; their
-//     handlers self-verify (Razorpay HMAC, Inngest signing key).
-//   - /dashboard/* and /s/* are INTERNAL rewrite targets and are blocked (404)
-//     as direct requests on every host, so the dashboard cannot be reached
-//     unauthenticated on the apex host and one tenant cannot serve another's
-//     site via /s/<other>.
+//  PATH MODE (single domain — e.g. *.vercel.app which has no wildcard subdomains;
+//  auto-on when the root domain is a vercel.app host, or NEXT_PUBLIC_PATH_ROUTING=1):
+//    everything is served at its real path on ONE host — marketing at /,
+//    dashboard at /dashboard/* (auth-gated), tenant sites at /s/<venue>. No
+//    rewriting; the internal paths ARE the public paths.
 //
-// Graceful degradation: if Clerk env keys are absent we skip auth entirely and
-// just do host routing, so the scaffold runs with zero third-party accounts.
+// /api + /trpc are never rewritten or Clerk-gated (handlers self-verify).
+// Graceful degradation: with no Clerk keys, auth is skipped entirely.
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse, type NextRequest } from "next/server";
 
@@ -25,6 +23,11 @@ import { RESERVED_SUBDOMAINS } from "@/lib/constants";
 const ROOT_DOMAIN = (process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? "lvh.me:3000")
   .split(":")[0]
   .toLowerCase();
+
+// Single-domain path routing — no wildcard subdomains available.
+const PATH_ROUTING =
+  process.env.NEXT_PUBLIC_PATH_ROUTING === "1" ||
+  ROOT_DOMAIN.includes("vercel.app");
 
 const clerkConfigured = !!(
   process.env.CLERK_SECRET_KEY && process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
@@ -46,7 +49,6 @@ function isApexHost(hostname: string): boolean {
   );
 }
 
-// API/trpc: served as-is on every host; handlers do their own auth.
 function isApiPath(pathname: string): boolean {
   return (
     pathname === "/api" ||
@@ -56,17 +58,16 @@ function isApiPath(pathname: string): boolean {
   );
 }
 
-// Internal rewrite targets — must never be addressable directly from any host.
-function isInternalPath(pathname: string): boolean {
-  return (
-    pathname === "/dashboard" ||
-    pathname.startsWith("/dashboard/") ||
-    pathname === "/s" ||
-    pathname.startsWith("/s/")
-  );
+function isDashboardPath(pathname: string): boolean {
+  return pathname === "/dashboard" || pathname.startsWith("/dashboard/");
 }
 
-/** Derive the tenant slug/domain from a non-apex, non-app host. */
+// Internal rewrite targets — blocked as direct requests in HOST mode only.
+function isInternalPath(pathname: string): boolean {
+  return isDashboardPath(pathname) || pathname === "/s" || pathname.startsWith("/s/");
+}
+
+/** Derive the tenant slug/domain from a non-apex, non-app host (HOST mode). */
 function tenantFromHost(hostname: string): string | null {
   let venue: string;
   if (hostname.endsWith(`.${ROOT_DOMAIN}`)) {
@@ -80,28 +81,29 @@ function tenantFromHost(hostname: string): string | null {
   return venue;
 }
 
-/** Internal rewrite target for a request, or null to serve at root (marketing). */
+/** HOST-mode rewrite target, or null to serve at root (marketing). */
 function resolveRewrite(req: NextRequest): URL | null {
   const url = req.nextUrl;
   const hostname = getHostname(req);
   const suffix = url.pathname === "/" ? "" : url.pathname;
 
-  if (isApexHost(hostname)) return null; // marketing lives at root
-
+  if (isApexHost(hostname)) return null;
   if (isAppHost(hostname)) {
     return new URL(`/dashboard${suffix}${url.search}`, req.url);
   }
-
   const venue = tenantFromHost(hostname);
-  if (!venue) return null; // reserved/unknown host → marketing fallback
+  if (!venue) return null;
   return new URL(`/s/${encodeURIComponent(venue)}${suffix}${url.search}`, req.url);
 }
 
 function routeRequest(req: NextRequest): NextResponse {
   const { pathname } = req.nextUrl;
-  // Real API routes resolve on any host; never rewrite them.
   if (isApiPath(pathname)) return NextResponse.next();
-  // Block direct access to internal rewrite targets (auth-bypass / cross-tenant).
+
+  // PATH mode: serve real paths directly on one host (no rewrite, no blocking).
+  if (PATH_ROUTING) return NextResponse.next();
+
+  // HOST mode: block direct access to internal targets, then host-rewrite.
   if (isInternalPath(pathname)) {
     return new NextResponse("Not Found", { status: 404 });
   }
@@ -109,21 +111,26 @@ function routeRequest(req: NextRequest): NextResponse {
   return rewrite ? NextResponse.rewrite(rewrite) : NextResponse.next();
 }
 
-// Dashboard pages that must NOT be auth-gated (sign-in/up live on app host).
-const isPublicAppRoute = createRouteMatcher(["/sign-in(.*)", "/sign-up(.*)"]);
+const isPublicHostRoute = createRouteMatcher(["/sign-in(.*)", "/sign-up(.*)"]);
+const isPublicPathRoute = createRouteMatcher([
+  "/dashboard/sign-in(.*)",
+  "/dashboard/sign-up(.*)",
+]);
+
+/** Whether the request is a dashboard PAGE that must be authenticated. */
+function shouldProtect(req: NextRequest): boolean {
+  const { pathname } = req.nextUrl;
+  if (isApiPath(pathname)) return false;
+  if (PATH_ROUTING) {
+    return isDashboardPath(pathname) && !isPublicPathRoute(req);
+  }
+  return isAppHost(getHostname(req)) && !isPublicHostRoute(req);
+}
 
 const handler = clerkConfigured
   ? clerkMiddleware(async (auth, req) => {
-      const { pathname } = req.nextUrl;
-      // Protect dashboard PAGES on the app host. Skip API (self-verifying) and
-      // the auth pages. Server actions / route handlers must STILL self-check.
-      if (
-        isAppHost(getHostname(req)) &&
-        !isApiPath(pathname) &&
-        !isPublicAppRoute(req)
-      ) {
-        await auth.protect();
-      }
+      // Server actions / route handlers must STILL self-check auth.
+      if (shouldProtect(req)) await auth.protect();
       return routeRequest(req);
     })
   : routeRequest;

@@ -166,7 +166,7 @@ export default async function WebsitePage() {
               rel="noreferrer"
               className="mt-0.5 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-primary"
             >
-              {site.slug}.venuepilot.in <ExternalLink className="size-3" />
+              {liveUrl.replace(/^https?:\/\//, "")} <ExternalLink className="size-3" />
             </a>
           </CardContent>
         </Card>

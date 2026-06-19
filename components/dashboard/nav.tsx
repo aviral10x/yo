@@ -23,6 +23,11 @@ import {
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { PATH_ROUTING } from "@/lib/urls";
+
+// In PATH mode the dashboard lives under /dashboard/*; in HOST mode it's at the
+// root of the app subdomain. Links are prefixed accordingly.
+const PREFIX = PATH_ROUTING ? "/dashboard" : "";
 
 const NAV = [
   { href: "/", label: "Overview", icon: LayoutDashboard },
@@ -57,10 +62,11 @@ export function DashboardNav() {
     <nav className="space-y-1">
       {NAV.map((i) => {
         const active = i.href === "/" ? path === "/" : path.startsWith(i.href);
+        const href = i.href === "/" ? PREFIX || "/" : `${PREFIX}${i.href}`;
         return (
           <Link
             key={i.href}
-            href={i.href}
+            href={href}
             className={cn(
               "flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors",
               active

@@ -1,6 +1,7 @@
 /** Shared shape for a single portfolio property row (demo + live-DB aligned). */
 export type PropertyRow = {
   id: string;
+  slug: string;
   name: string;
   city: string;
   /** venueTypeEnum value: lawn | banquet | resort | farmhouse | hotel. */

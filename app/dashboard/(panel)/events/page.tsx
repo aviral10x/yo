@@ -218,7 +218,7 @@ export default async function EventsPage() {
         title="Events"
         description={
           org
-            ? "Run your won bookings — checklist, timeline, menu, rooming, vendors, and day sheets."
+            ? "Run your own bookings — checklist, timeline, menu, rooming, vendors, and day sheets."
             : "Showing demo events. Connect a database to run your real bookings."
         }
       />

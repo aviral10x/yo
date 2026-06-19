@@ -206,9 +206,9 @@ export const DEMO_DEMAND = [
 
 /** Portfolio: properties for owners with multiple venues. */
 export const DEMO_PROPERTIES = [
-  { id: "v1", name: "Rosewood Garden", city: "Jaipur", type: "resort", enquiries: 19, bookings: 6, occupancy: 72, revenue: 6100000 },
-  { id: "v2", name: "Rosewood Banquets", city: "Udaipur", type: "banquet", enquiries: 12, bookings: 4, occupancy: 64, revenue: 3200000 },
-  { id: "v3", name: "Rosewood Farm", city: "Jaipur", type: "farmhouse", enquiries: 8, bookings: 2, occupancy: 41, revenue: 1500000 },
+  { id: "v1", slug: "rosewood-garden", name: "Rosewood Garden", city: "Jaipur", type: "resort", enquiries: 19, bookings: 6, occupancy: 72, revenue: 6100000 },
+  { id: "v2", slug: "rosewood-banquets", name: "Rosewood Banquets", city: "Udaipur", type: "banquet", enquiries: 12, bookings: 4, occupancy: 64, revenue: 3200000 },
+  { id: "v3", slug: "rosewood-farm", name: "Rosewood Farm", city: "Jaipur", type: "farmhouse", enquiries: 8, bookings: 2, occupancy: 41, revenue: 1500000 },
 ];
 
 /** Team members + roles. */

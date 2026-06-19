@@ -41,6 +41,7 @@ async function loadFromDb(orgId: string): Promise<PropertyRow[]> {
   const venues = await db
     .select({
       id: schema.venues.id,
+      slug: schema.venues.slug,
       name: schema.venues.name,
       city: schema.venues.city,
       type: schema.venues.type,
@@ -127,6 +128,7 @@ async function loadFromDb(orgId: string): Promise<PropertyRow[]> {
     );
     return {
       id: v.id,
+      slug: v.slug,
       name: v.name,
       city: v.city ?? "—",
       type: v.type,

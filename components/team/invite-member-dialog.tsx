@@ -25,12 +25,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { inviteMember, type ActionState } from "@/app/dashboard/(panel)/team/actions";
-import { ROLE_PERMISSIONS, ROLES } from "./team-types";
+import { ROLE_PERMISSIONS, ROLES, type Role } from "./team-types";
 
 const INITIAL: ActionState = { ok: false, message: "" };
 
 export function InviteMemberDialog({ liveDb }: { liveDb: boolean }) {
   const [open, setOpen] = useState(false);
+  const [role, setRole] = useState<Role>("staff");
   const formRef = useRef<HTMLFormElement>(null);
 
   const [, action, pending] = useActionState(
@@ -90,7 +91,11 @@ export function InviteMemberDialog({ liveDb }: { liveDb: boolean }) {
 
           <div className="space-y-1.5">
             <Label>Role</Label>
-            <Select name="role" defaultValue="staff">
+            <Select
+              name="role"
+              value={role}
+              onValueChange={(v) => setRole(v as Role)}
+            >
               <SelectTrigger className="w-full">
                 <SelectValue />
               </SelectTrigger>
@@ -103,7 +108,7 @@ export function InviteMemberDialog({ liveDb }: { liveDb: boolean }) {
               </SelectContent>
             </Select>
             <p className="text-xs text-muted-foreground">
-              {ROLE_PERMISSIONS.staff.summary}
+              {ROLE_PERMISSIONS[role].summary}
             </p>
           </div>
 

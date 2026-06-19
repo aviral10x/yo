@@ -41,6 +41,11 @@ export default async function VenueSite({
   const type = venue?.type ? VENUE_TYPE_LABELS[venue.type] : "Wedding Venue";
   const location = [venue?.city, venue?.state].filter(Boolean).join(", ");
   const hero = pick(HEROES, slug);
+  // Placeholder contact until a venue contact number lives in settings.
+  const phone = "+919000000000";
+  const phoneDigits = phone.replace(/\D/g, "");
+  const waHref = `https://wa.me/${phoneDigits}`;
+  const telHref = `tel:${phone}`;
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -50,11 +55,13 @@ export default async function VenueSite({
             {name}
           </span>
           <div className="flex items-center gap-2">
-            <Button size="sm" variant="secondary">
-              <CalendarCheck className="size-4" /> Check availability
+            <Button size="sm" variant="secondary" asChild>
+              <a href="#enquire">
+                <CalendarCheck className="size-4" /> Check availability
+              </a>
             </Button>
-            <Button size="sm" className="hidden sm:inline-flex">
-              Enquire
+            <Button size="sm" className="hidden sm:inline-flex" asChild>
+              <a href="#enquire">Enquire</a>
             </Button>
           </div>
         </div>
@@ -89,11 +96,13 @@ export default async function VenueSite({
             </p>
           )}
           <div className="mt-8 flex flex-wrap gap-3">
-            <Button size="lg">
-              <CalendarCheck className="size-4" /> Check your date
+            <Button size="lg" asChild>
+              <a href="#enquire">
+                <CalendarCheck className="size-4" /> Check your date
+              </a>
             </Button>
-            <Button size="lg" variant="secondary">
-              Book a site visit
+            <Button size="lg" variant="secondary" asChild>
+              <a href="#enquire">Book a site visit</a>
             </Button>
           </div>
         </div>
@@ -168,23 +177,28 @@ export default async function VenueSite({
       </section>
 
       {/* Enquiry CTA */}
-      <section className="bg-emerald-950 text-emerald-50">
+      <section id="enquire" className="scroll-mt-16 bg-emerald-950 text-emerald-50">
         <div className="mx-auto max-w-3xl px-6 py-16 text-center">
           <h2 className="font-serif text-3xl font-semibold sm:text-4xl">
             Is your date available?
           </h2>
           <p className="mx-auto mt-3 max-w-xl text-emerald-100/80">
-            Check instantly, get a quote, and place a hold — no back-and-forth.
+            Message us on WhatsApp or call — we reply within minutes.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <Button size="lg" variant="secondary">
-              <CalendarCheck className="size-4" /> Check your date
-            </Button>
             <Button
               size="lg"
               className="bg-white text-emerald-950 hover:bg-white/90"
+              asChild
             >
-              <Phone className="size-4" /> WhatsApp us
+              <a href={waHref} target="_blank" rel="noopener noreferrer">
+                <Phone className="size-4" /> WhatsApp us
+              </a>
+            </Button>
+            <Button size="lg" variant="secondary" asChild>
+              <a href={telHref}>
+                <Phone className="size-4" /> Call us
+              </a>
             </Button>
           </div>
         </div>
