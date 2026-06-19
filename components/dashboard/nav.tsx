@@ -3,7 +3,10 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  BarChart3,
+  Boxes,
   CalendarDays,
+  Clapperboard,
   FileText,
   Globe,
   ImageIcon,
@@ -24,8 +27,11 @@ const NAV = [
   { href: "/calendar", label: "Calendar", icon: CalendarDays },
   { href: "/proposals", label: "Proposals", icon: FileText },
   { href: "/events", label: "Events", icon: PartyPopper },
+  { href: "/inventory", label: "Inventory", icon: Boxes },
   { href: "/media", label: "Media", icon: ImageIcon },
+  { href: "/studio", label: "Studio", icon: Clapperboard },
   { href: "/reviews", label: "Reviews", icon: Star },
+  { href: "/analytics", label: "Analytics", icon: BarChart3 },
   { href: "/website", label: "Website", icon: Globe },
   { href: "/settings", label: "Settings", icon: Settings },
 ];

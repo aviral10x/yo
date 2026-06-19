@@ -128,3 +128,47 @@ export const DEMO_MESSAGES = [
   { id: "ms_1", couple: "Priya & Aman", direction: "in" as const, body: "Hi, is 6 Dec available for 600 guests?", aiDraft: "Namaste! Haan ji, 6 December is available on The Grand Lawn (up to 1200). Our Gold package suits 600 guests — shall I share details and book a site visit?" },
   { id: "ms_2", couple: "Sara & Kabir", direction: "in" as const, body: "What's your per plate for veg?", aiDraft: "Hi Sara! Our veg menus start at ₹1,200/plate (Silver) and ₹1,800/plate (Gold). Want me to send sample menus?" },
 ];
+
+// ---- Phase 2 demo data --------------------------------------------------
+
+/** Room inventory (for resorts/farmhouses on the Growth plan). */
+export const DEMO_ROOMS = [
+  { id: "rm_1", name: "Garden View Rooms", kind: "room_block", count: 24, tariff: 6500 },
+  { id: "rm_2", name: "Premium Suites", kind: "room_block", count: 6, tariff: 12000 },
+  { id: "rm_3", name: "Cottages", kind: "room_block", count: 8, tariff: 9000 },
+];
+
+/** Analytics dashboard demo (the PMF metrics, funnel, sources, revenue). */
+export const DEMO_ANALYTICS = {
+  funnel: [
+    { stage: "Enquiries", count: 84 },
+    { stage: "Qualified", count: 52 },
+    { stage: "Site visits", count: 31 },
+    { stage: "Quotes", count: 22 },
+    { stage: "Deposits", count: 14 },
+    { stage: "Confirmed", count: 11 },
+  ],
+  monthly: [
+    { month: "Jan", enquiries: 9, bookings: 2 },
+    { month: "Feb", enquiries: 12, bookings: 3 },
+    { month: "Mar", enquiries: 11, bookings: 2 },
+    { month: "Apr", enquiries: 15, bookings: 4 },
+    { month: "May", enquiries: 18, bookings: 5 },
+    { month: "Jun", enquiries: 19, bookings: 6 },
+  ],
+  bySource: [
+    { source: "Direct", value: 38 },
+    { source: "WhatsApp", value: 24 },
+    { source: "WedMeGood", value: 18 },
+    { source: "Referral", value: 12 },
+    { source: "Weddingz", value: 8 },
+  ],
+  revenue: [
+    { month: "Jan", value: 1800000 },
+    { month: "Feb", value: 3200000 },
+    { month: "Mar", value: 2100000 },
+    { month: "Apr", value: 4400000 },
+    { month: "May", value: 5200000 },
+    { month: "Jun", value: 6100000 },
+  ],
+};
