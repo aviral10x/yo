@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { appUrl } from "@/lib/urls";
 
 const NAV = [
+  { href: "/venues", label: "Browse venues" },
   { href: "/#features", label: "Features" },
   { href: "/#pricing", label: "Pricing" },
   { href: "/audit", label: "Free audit" },

@@ -217,3 +217,26 @@ export const DEMO_TEAM = [
   { id: "u2", name: "Sunita Rao", email: "sunita@rosewood.in", role: "manager" as const, lastActive: "2h ago" },
   { id: "u3", name: "Imran Khan", email: "imran@rosewood.in", role: "staff" as const, lastActive: "Yesterday" },
 ];
+
+// ---- Phase 4 demo data (Marketplace) ------------------------------------
+
+/** Couple-facing discovery marketplace listings. */
+export const DEMO_DISCOVERY_VENUES = [
+  { slug: "rosewood-garden", name: "Rosewood Garden", city: "Jaipur", state: "Rajasthan", type: "resort", capacity: 1200, priceFrom: 1500000, rating: 4.9, reviews: 128, image: "https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=800&q=80&auto=format&fit=crop" },
+  { slug: "lily-lawns", name: "Lily Lawns", city: "Jaipur", state: "Rajasthan", type: "lawn", capacity: 800, priceFrom: 700000, rating: 4.7, reviews: 86, image: "https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=800&q=80&auto=format&fit=crop" },
+  { slug: "lake-pavilion", name: "Lake Pavilion", city: "Udaipur", state: "Rajasthan", type: "resort", capacity: 600, priceFrom: 2500000, rating: 5.0, reviews: 64, image: "https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=800&q=80&auto=format&fit=crop" },
+  { slug: "the-grand-hall", name: "The Grand Hall", city: "Delhi", state: "Delhi", type: "banquet", capacity: 500, priceFrom: 900000, rating: 4.6, reviews: 142, image: "https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?w=800&q=80&auto=format&fit=crop" },
+  { slug: "palm-grove-farm", name: "Palm Grove Farmhouse", city: "Gurugram", state: "Haryana", type: "farmhouse", capacity: 700, priceFrom: 650000, rating: 4.5, reviews: 53, image: "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800&q=80&auto=format&fit=crop" },
+  { slug: "seaside-resort", name: "Seaside Resort", city: "Goa", state: "Goa", type: "resort", capacity: 400, priceFrom: 1800000, rating: 4.8, reviews: 97, image: "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=800&q=80&auto=format&fit=crop" },
+];
+
+/** A raw pasted marketplace enquiry, for the AI lead-import parser demo. */
+export const DEMO_IMPORT_SAMPLE = `New enquiry — WedMeGood
+Name: Kavya & Arnav
+Phone: +91 90000 12345
+Email: kavya@example.com
+Event: Wedding
+Date: 12 Dec 2026
+Guests: 550
+City: Jaipur
+Message: Looking for a lawn with rooms for outstation guests.`;
