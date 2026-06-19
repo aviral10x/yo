@@ -16,6 +16,10 @@ export type AuthContext = {
   /** Clerk organization id — maps to our `organizations.clerkOrgId`. */
   orgId: string | null;
   orgSlug: string | null;
+  /** Clerk org role (e.g. "org:admin", "org:member") — the authority for
+   *  role-gated actions. Never derive authorization from a self-provisioned
+   *  local membership row alone. */
+  orgRole: string | null;
 };
 
 /**
@@ -28,14 +32,21 @@ export type AuthContext = {
  */
 export async function getAuthContext(): Promise<AuthContext> {
   if (!clerkConfigured) {
-    return { configured: false, userId: null, orgId: null, orgSlug: null };
+    return {
+      configured: false,
+      userId: null,
+      orgId: null,
+      orgSlug: null,
+      orgRole: null,
+    };
   }
-  const { userId, orgId, orgSlug } = await auth();
+  const { userId, orgId, orgSlug, orgRole } = await auth();
   return {
     configured: true,
     userId: userId ?? null,
     orgId: orgId ?? null,
     orgSlug: orgSlug ?? null,
+    orgRole: orgRole ?? null,
   };
 }
 

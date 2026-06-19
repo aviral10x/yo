@@ -21,8 +21,12 @@ export function isDbConfigured(): boolean {
  */
 export async function getActiveOrg(): Promise<Org | null> {
   if (!isDbConfigured()) return null;
-  const { configured, userId, orgId, orgSlug } = await getAuthContext();
+  const { configured, userId, orgId, orgSlug, orgRole } = await getAuthContext();
   if (!configured || !userId || !orgId) return null;
+
+  // Seed the local membership role from the Clerk org role — NEVER hardcode
+  // "owner", or every member who opens the dashboard self-escalates to owner.
+  const seedRole: "owner" | "staff" = orgRole === "org:admin" ? "owner" : "staff";
 
   try {
     const db = getDb();
@@ -46,7 +50,7 @@ export async function getActiveOrg(): Promise<Org | null> {
 
     await db
       .insert(schema.memberships)
-      .values({ organizationId: org.id, userId: user.id, role: "owner" })
+      .values({ organizationId: org.id, userId: user.id, role: seedRole })
       .onConflictDoNothing();
 
     return org;
