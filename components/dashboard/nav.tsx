@@ -5,9 +5,11 @@ import { usePathname } from "next/navigation";
 import {
   CalendarDays,
   FileText,
+  Globe,
   ImageIcon,
   Inbox,
   LayoutDashboard,
+  MessageSquare,
   PartyPopper,
   Settings,
   Star,
@@ -18,11 +20,13 @@ import { cn } from "@/lib/utils";
 const NAV = [
   { href: "/", label: "Overview", icon: LayoutDashboard },
   { href: "/leads", label: "Leads", icon: Inbox },
+  { href: "/messages", label: "Messages", icon: MessageSquare },
   { href: "/calendar", label: "Calendar", icon: CalendarDays },
   { href: "/proposals", label: "Proposals", icon: FileText },
   { href: "/events", label: "Events", icon: PartyPopper },
   { href: "/media", label: "Media", icon: ImageIcon },
   { href: "/reviews", label: "Reviews", icon: Star },
+  { href: "/website", label: "Website", icon: Globe },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 
