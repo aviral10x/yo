@@ -64,6 +64,22 @@ export async function placeHoldAction(
       };
     }
 
+    // Never trust a client-supplied leadId — only use it if it belongs to this org.
+    let safeLeadId: string | null = null;
+    if (leadId) {
+      const [own] = await db
+        .select({ id: schema.leads.id })
+        .from(schema.leads)
+        .where(
+          and(
+            eq(schema.leads.id, leadId),
+            eq(schema.leads.organizationId, org.id),
+          ),
+        )
+        .limit(1);
+      safeLeadId = own?.id ?? null;
+    }
+
     const holdExpiresAt = new Date();
     holdExpiresAt.setDate(holdExpiresAt.getDate() + 7);
 
@@ -72,20 +88,20 @@ export async function placeHoldAction(
       .values({
         organizationId: org.id,
         venueId: venue.id,
-        leadId: leadId ?? null,
+        leadId: safeLeadId,
         status: "provisional",
         eventDate,
         holdExpiresAt,
       })
       .returning({ id: schema.bookings.id });
 
-    if (leadId) {
+    if (safeLeadId) {
       await db
         .update(schema.leads)
         .set({ stage: "hold" })
         .where(
           and(
-            eq(schema.leads.id, leadId),
+            eq(schema.leads.id, safeLeadId),
             eq(schema.leads.organizationId, org.id),
           ),
         );

@@ -1,5 +1,8 @@
 import "server-only";
 
+import { lookup } from "node:dns/promises";
+import { isIP } from "node:net";
+
 import { anthropicConfigured, generateObject } from "@/lib/ai/claude";
 
 /**
@@ -67,27 +70,91 @@ export function gradeFor(score: number): AuditResult["grade"] {
   return "D";
 }
 
-/** Best-effort fetch of the venue's site so the audit is grounded in reality. */
+const BLOCKED_HOSTS = new Set([
+  "localhost",
+  "metadata",
+  "metadata.google.internal",
+]);
+
+/** True if an IP literal is loopback/private/link-local/reserved. */
+function ipIsPrivate(ip: string): boolean {
+  if (isIP(ip) === 4) {
+    const p = ip.split(".").map(Number);
+    return (
+      p[0] === 0 ||
+      p[0] === 10 ||
+      p[0] === 127 ||
+      (p[0] === 169 && p[1] === 254) ||
+      (p[0] === 172 && p[1] >= 16 && p[1] <= 31) ||
+      (p[0] === 192 && p[1] === 168) ||
+      (p[0] === 100 && p[1] >= 64 && p[1] <= 127) ||
+      p[0] >= 224
+    );
+  }
+  const v = ip.toLowerCase();
+  if (v === "::1" || v === "::") return true;
+  if (v.startsWith("fe80") || v.startsWith("fc") || v.startsWith("fd")) return true;
+  const mapped = v.match(/::ffff:(\d+\.\d+\.\d+\.\d+)$/);
+  if (mapped) return ipIsPrivate(mapped[1]);
+  return false;
+}
+
+/** SSRF guard: reject loopback/private/link-local targets (literal or resolved). */
+async function isSafePublicHost(hostname: string): Promise<boolean> {
+  const h = hostname.toLowerCase();
+  if (BLOCKED_HOSTS.has(h)) return false;
+  if (isIP(h)) return !ipIsPrivate(h);
+  try {
+    const addrs = await lookup(h, { all: true });
+    return addrs.length > 0 && addrs.every((a) => !ipIsPrivate(a.address));
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Best-effort fetch of the venue's site so the audit is grounded in reality.
+ * SSRF-guarded: this runs from an unauthenticated public action, so it blocks
+ * internal/loopback/link-local targets and re-checks the host on every redirect
+ * hop (redirect: "manual"), and restricts to ports 80/443.
+ */
 async function fetchSiteText(url?: string): Promise<string> {
   if (!url) return "";
   let target = url.trim();
   if (!/^https?:\/\//i.test(target)) target = `https://${target}`;
-  let parsed: URL;
+  let current: URL;
   try {
-    parsed = new URL(target);
+    current = new URL(target);
   } catch {
     return "";
   }
-  if (parsed.protocol !== "http:" && parsed.protocol !== "https:") return "";
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 6000);
   try {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 6000);
-    const res = await fetch(parsed.toString(), {
-      signal: controller.signal,
-      headers: { "user-agent": "VenuePilotAuditBot/1.0" },
-    });
-    clearTimeout(timer);
-    if (!res.ok) return "";
+    let res: Response | undefined;
+    for (let hop = 0; hop < 3; hop++) {
+      if (current.protocol !== "http:" && current.protocol !== "https:") return "";
+      if (current.port && !["", "80", "443"].includes(current.port)) return "";
+      if (!(await isSafePublicHost(current.hostname))) return "";
+      res = await fetch(current.toString(), {
+        signal: controller.signal,
+        redirect: "manual",
+        headers: { "user-agent": "VenuePilotAuditBot/1.0" },
+      });
+      if (res.status >= 300 && res.status < 400) {
+        const loc = res.headers.get("location");
+        if (!loc) break;
+        try {
+          current = new URL(loc, current);
+        } catch {
+          return "";
+        }
+        continue;
+      }
+      break;
+    }
+    if (!res || !res.ok) return "";
     const html = await res.text();
     return html
       .replace(/<script[\s\S]*?<\/script>/gi, " ")
@@ -98,6 +165,8 @@ async function fetchSiteText(url?: string): Promise<string> {
       .slice(0, 5000);
   } catch {
     return "";
+  } finally {
+    clearTimeout(timer);
   }
 }
 

@@ -88,29 +88,23 @@ export default async function MediaPage() {
               <Wand2 className="size-[18px]" />
             </span>
             <div className="text-sm">
-              <p className="font-medium">Photos are auto-tagged on upload</p>
+              <p className="font-medium">AI tags every shot — then you filter by it</p>
               <p className="mt-0.5 text-muted-foreground">
-                Our AI labels each shot — recognising{" "}
+                Hit{" "}
+                <span className="font-medium text-foreground">Auto-tag with AI</span>{" "}
+                on any photo to label it — recognising{" "}
                 <span className="font-medium text-foreground">mandap</span>,{" "}
                 <span className="font-medium text-foreground">night lighting</span>,
                 and{" "}
                 <span className="font-medium text-foreground">rain backup</span>{" "}
-                setups — so the right photo surfaces instantly in listings,
-                proposals, and your website.
+                setups. Edit the chips, then filter the pack by tag so the right
+                photo surfaces instantly in listings, proposals, and your website.
               </p>
             </div>
           </CardContent>
         </Card>
 
-        <div>
-          <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-sm font-semibold">The photo pack</h2>
-            <span className="text-xs text-muted-foreground">
-              12 standard shots every venue needs
-            </span>
-          </div>
-          <MediaPack slots={slots} />
-        </div>
+        <MediaPack slots={slots} liveDb={!!org} />
       </div>
     </div>
   );

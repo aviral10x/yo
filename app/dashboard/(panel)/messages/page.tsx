@@ -1,5 +1,5 @@
 import { Languages, MessageSquare, Sparkles, Timer } from "lucide-react";
-import { asc, eq } from "drizzle-orm";
+import { and, asc, eq } from "drizzle-orm";
 
 import { PageHeader } from "@/components/dashboard/page-header";
 import { Stat } from "@/components/dashboard/stat";
@@ -127,7 +127,13 @@ async function liveThreads(orgId: string): Promise<Thread[]> {
       createdAt: schema.messages.createdAt,
     })
     .from(schema.conversations)
-    .leftJoin(schema.leads, eq(schema.conversations.leadId, schema.leads.id))
+    .leftJoin(
+      schema.leads,
+      and(
+        eq(schema.conversations.leadId, schema.leads.id),
+        eq(schema.leads.organizationId, orgId),
+      ),
+    )
     .innerJoin(
       schema.messages,
       eq(schema.messages.conversationId, schema.conversations.id),
