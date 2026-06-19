@@ -5,6 +5,8 @@ import { usePathname } from "next/navigation";
 import {
   BarChart3,
   Boxes,
+  Brain,
+  Building2,
   CalendarDays,
   Clapperboard,
   FileText,
@@ -16,12 +18,14 @@ import {
   PartyPopper,
   Settings,
   Star,
+  Users,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
 const NAV = [
   { href: "/", label: "Overview", icon: LayoutDashboard },
+  { href: "/portfolio", label: "Portfolio", icon: Building2 },
   { href: "/leads", label: "Leads", icon: Inbox },
   { href: "/messages", label: "Messages", icon: MessageSquare },
   { href: "/calendar", label: "Calendar", icon: CalendarDays },
@@ -32,7 +36,9 @@ const NAV = [
   { href: "/studio", label: "Studio", icon: Clapperboard },
   { href: "/reviews", label: "Reviews", icon: Star },
   { href: "/analytics", label: "Analytics", icon: BarChart3 },
+  { href: "/intelligence", label: "Intelligence", icon: Brain },
   { href: "/website", label: "Website", icon: Globe },
+  { href: "/team", label: "Team", icon: Users },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 

@@ -172,3 +172,48 @@ export const DEMO_ANALYTICS = {
     { month: "Jun", value: 6100000 },
   ],
 };
+
+// ---- Phase 3 demo data (Intelligence + Portfolio) -----------------------
+
+/** AI lead/enquiry scoring. */
+export const DEMO_LEAD_SCORES = [
+  { id: "ld_4", coupleName: "Anjali & Vikram", score: 92, tier: "hot" as const, reasons: ["800 guests — high value", "Referral source", "Site visit completed", "Feb peak date"] },
+  { id: "ld_7", coupleName: "Ishita & Karan", score: 88, tier: "hot" as const, reasons: ["700 guests", "Reached deposit stage", "Very responsive on WhatsApp"] },
+  { id: "ld_3", coupleName: "Neha & Rohit", score: 64, tier: "warm" as const, reasons: ["300 guests", "Marketplace lead", "Not yet visited"] },
+  { id: "ld_1", coupleName: "Priya & Aman", score: 58, tier: "warm" as const, reasons: ["600 guests", "New enquiry", "Peak date requested"] },
+  { id: "ld_9", coupleName: "Pooja & Nikhil", score: 28, tier: "cold" as const, reasons: ["150 guests — low value", "Off-season", "Went quiet 10 days"] },
+];
+
+/** AI price recommendations by event type + season. */
+export const DEMO_PRICE_RECS = [
+  { eventType: "Wedding", season: "Peak (Nov–Feb)", current: 1500000, suggested: 1850000, change: 23, rationale: "Saturdays in your peak window are ~80% booked — raise to capture demand." },
+  { eventType: "Wedding", season: "Off-peak (Jun–Sep)", current: 1500000, suggested: 1250000, change: -17, rationale: "Low occupancy — a monsoon package fills otherwise-empty dates." },
+  { eventType: "Reception", season: "Peak", current: 800000, suggested: 950000, change: 19, rationale: "Strong reception demand; keep weekday discounts to stay competitive." },
+];
+
+/** Date-demand heat map: demand intensity 0–100 per upcoming month. */
+export const DEMO_DEMAND = [
+  { month: "Jul 2026", demand: 35 },
+  { month: "Aug 2026", demand: 28 },
+  { month: "Sep 2026", demand: 40 },
+  { month: "Oct 2026", demand: 72 },
+  { month: "Nov 2026", demand: 95 },
+  { month: "Dec 2026", demand: 98 },
+  { month: "Jan 2027", demand: 90 },
+  { month: "Feb 2027", demand: 88 },
+  { month: "Mar 2027", demand: 55 },
+];
+
+/** Portfolio: properties for owners with multiple venues. */
+export const DEMO_PROPERTIES = [
+  { id: "v1", name: "Rosewood Garden", city: "Jaipur", type: "resort", enquiries: 19, bookings: 6, occupancy: 72, revenue: 6100000 },
+  { id: "v2", name: "Rosewood Banquets", city: "Udaipur", type: "banquet", enquiries: 12, bookings: 4, occupancy: 64, revenue: 3200000 },
+  { id: "v3", name: "Rosewood Farm", city: "Jaipur", type: "farmhouse", enquiries: 8, bookings: 2, occupancy: 41, revenue: 1500000 },
+];
+
+/** Team members + roles. */
+export const DEMO_TEAM = [
+  { id: "u1", name: "Aviral Gupta", email: "owner@rosewood.in", role: "owner" as const, lastActive: "Just now" },
+  { id: "u2", name: "Sunita Rao", email: "sunita@rosewood.in", role: "manager" as const, lastActive: "2h ago" },
+  { id: "u3", name: "Imran Khan", email: "imran@rosewood.in", role: "staff" as const, lastActive: "Yesterday" },
+];
